@@ -60,7 +60,7 @@ if [ -z $host ]; then echo -e $help; exit ${STATE_UNKNOWN}; fi
 #########################################################################
 # Pre-checks
 if [[ ! -x $omping ]]; then echo "CRITICAL - $omping not found/not executable"; fi
-if [ -z $local_ip ] || [ $local_ip == "" ]; then echo "UNKNOWN - local ip not defined"; fi
+if [[ -z $local_ip ]] || [[ $local_ip == "" ]]; then echo "UNKNOWN - local ip not defined"; fi
 #########################################################################
 output="$($omping -p ${port} -qq -c ${count} -O client -T ${timeout} ${local_ip} ${host})"
 
