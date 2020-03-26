@@ -65,8 +65,8 @@ if [[ "$output" =~ "never received" ]]; then
         echo "CRITICAL - response message from ${target} never received (timeout)"; exit 2
 elif [[ "$output" =~ "unicast" ]]; then
         # We got a summary response
-        # 10.162.215.92 :   unicast, xmt/rcv/%loss = 10/10/0%, min/avg/max/std-dev = 5.812/6.041/6.295/0.164
-        # 10.162.215.92 : multicast, xmt/rcv/%loss = 10/0/100%, min/avg/max/std-dev = 0.000/0.000/0.000/0.000
+        # 10.10.50.30 :   unicast, xmt/rcv/%loss = 10/10/0%, min/avg/max/std-dev = 5.812/6.041/6.295/0.164
+        # 10.10.50.30 : multicast, xmt/rcv/%loss = 10/0/100%, min/avg/max/std-dev = 0.000/0.000/0.000/0.000
         unicast_loss=$(echo "$output" | awk '/unicast/ {print $6}' | awk -F '/' '{print $3}' | sed 's/[^0-9]//g')
         multicast_loss=$(echo "$output" | awk '/multicast/ {print $6}' | awk -F '/' '{print $3}' | sed 's/[^0-9]//g')
 
