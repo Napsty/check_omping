@@ -66,7 +66,7 @@ output="$($omping -p ${port} -qq -c ${count} -O client -T ${timeout} ${local_ip}
 
 if [[ "$output" =~ "never received" ]]; then
         # We got no connection to the target
-        echo "CRITICAL - response message from ${target} never received (timeout)"; exit ${STATE_CRITICAL}
+        echo "CRITICAL - response message from ${host} on port ${port} never received (timeout)"; exit ${STATE_CRITICAL}
 elif [[ "$output" =~ "unicast" ]]; then
         # We got a summary response
         # 10.10.50.30 :   unicast, xmt/rcv/%loss = 10/10/0%, min/avg/max/std-dev = 5.812/6.041/6.295/0.164
