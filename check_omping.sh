@@ -30,6 +30,10 @@ crit=90
 timeout=10
 count=10
 local_ip=$(hostname -I)
+STATE_OK=0
+STATE_WARNING=1
+STATE_CRITICAL=2
+STATE_UNKNOWN=3
 #########################################################################
 help="check_omping.sh (c) 2020 Claudio Kuenzler\n
 Usage: $0 -H targetIP [-p port] [-l localIP] [-o /path/to/omping] [-w warnpercent] [-c critpercent] [-t timeout] [-c count]\n
@@ -46,7 +50,7 @@ do
        w)      warn=${OPTARG};;
        c)      crit=${OPTARG};;
        *)      echo -e $help
-               exit $STATE_UNKNOWN
+               exit ${STATE_UNKNOWN}
                ;;
        esac
 done
@@ -62,7 +66,7 @@ output="$($omping -p ${port} -qq -c ${count} -O client -T ${timeout} ${local_ip}
 
 if [[ "$output" =~ "never received" ]]; then
         # We got no connection to the target
-        echo "CRITICAL - response message from ${target} never received (timeout)"; exit 2
+        echo "CRITICAL - response message from ${target} never received (timeout)"; exit ${STATE_CRITICAL}
 elif [[ "$output" =~ "unicast" ]]; then
         # We got a summary response
         # 10.10.50.30 :   unicast, xmt/rcv/%loss = 10/10/0%, min/avg/max/std-dev = 5.812/6.041/6.295/0.164
@@ -71,15 +75,15 @@ elif [[ "$output" =~ "unicast" ]]; then
         multicast_loss=$(echo "$output" | awk '/multicast/ {print $6}' | awk -F '/' '{print $3}' | sed 's/[^0-9]//g')
 
         if [[ $multicast_loss -gt $crit ]]; then
-                echo "CRITICAL - Multicast package loss to ${host} is ${multicast_loss}%|multicast_loss=${multicast_loss}%;80;90;0;100 unicast_loss=${unicast_loss}%;80;90;0;100"; exit 2
+                echo "CRITICAL - Multicast package loss to ${host} is ${multicast_loss}%|multicast_loss=${multicast_loss}%;80;90;0;100 unicast_loss=${unicast_loss}%;80;90;0;100"; exit ${STATE_CRITICAL}
         elif [[ $multicast_loss -gt $warn ]]; then
-                echo "WARNING - Multicast package loss to ${host} is ${multicast_loss}%|multicast_loss=${multicast_loss}%;80;90;0;100 unicast_loss=${unicast_loss}%;80;90;0;100"; exit 2
+                echo "WARNING - Multicast package loss to ${host} is ${multicast_loss}%|multicast_loss=${multicast_loss}%;80;90;0;100 unicast_loss=${unicast_loss}%;80;90;0;100"; exit ${STATE_CRITICAL}
         elif [[ $multicast_loss -eq 0 ]]; then
-                echo "OK - Multicast package loss to ${host} is ${multicast_loss}%|multicast_loss=${multicast_loss}%;80;90;0;100 unicast_loss=${unicast_loss}%;80;90;0;100"; exit 0
+                echo "OK - Multicast package loss to ${host} is ${multicast_loss}%|multicast_loss=${multicast_loss}%;80;90;0;100 unicast_loss=${unicast_loss}%;80;90;0;100"; exit ${STATE_OK}
         fi
 
 else
-        echo "CRITICAL - no output received from omping"; exit 2
+        echo "CRITICAL - no output received from omping"; exit ${STATE_CRITICAL}
 fi
 
-echo "Should never reach this part"; exit 3
+echo "Should never reach this part"; exit ${STATE_UNKNOWN}
